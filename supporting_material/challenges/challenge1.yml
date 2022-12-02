@@ -1,3 +1,5 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Zack olivier | This template deploy a VPC and security group
 Parameters:
   myVPC:
       Description: VPC used to deploy our resources below
