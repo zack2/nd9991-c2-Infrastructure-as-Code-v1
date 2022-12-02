@@ -5,48 +5,58 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Creates the required network infrastructure for Public and Private routing with Internet access
 Parameters:
+  EnvironmentName:
+    Type: String
   VPCCIDR:
     Type: String
+    Default: 10.0.1.0/24
   PrivSubnetCIDR:
     Type: String
+    Default: 10.0.1.0/24
   PubSubnetCIDR:
     Type: String
+    Default: 10.0.1.0/24
 Resources:
   MainVPC:
     Type: AWS::EC2::VPC
-    Properties: 
+    Properties:
+      EnableDnsHostnames: true
       CidrBlock: !Ref VPCCIDR
       Tags: 
         - Key: Name
-          Value: "Main VPC"
+          Value: !Ref EnvironmentName
   InternetGW:
     Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref EnvironmentName
   AttachInternetGateway:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       VpcId: !Ref MainVPC
       InternetGatewayId: !Ref InternetGW
+
   PublicSubnet1:
     Type: AWS::EC2::Subnet
-    Properties: 
-      # Availability zone at your discretion or
-      # as a parameter
-      AvailabilityZone: 'us-east-1a'
+    Properties:
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
       CidrBlock: !Ref PubSubnetCIDR
       MapPublicIpOnLaunch: true
       Tags: 
         - Key: Name
-          Value: "Public Subnet AZ1"
+          Value: !Sub ${EnvironmentName} Public Subnet
       VpcId: !Ref MainVPC
+
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
-    Properties: 
-      AvailabilityZone: 'us-east-1b'
+    Properties:
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
       CidrBlock: !Ref PrivSubnetCIDR
       MapPublicIpOnLaunch: false
       Tags: 
         - Key: Name
-          Value: "Private Subnet AZ1"
+          Value: !Sub ${EnvironmentName} Private Subnet
       VpcId: !Ref MainVPC
   NAT:
     Type: AWS::EC2::NatGateway
