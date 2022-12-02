@@ -30,3 +30,4 @@ Resources:
         InternetGatewayId: !Ref InternetGateway
         VpcId: !Ref VPC
 
+
